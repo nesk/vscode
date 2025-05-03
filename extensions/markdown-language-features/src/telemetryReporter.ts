@@ -43,8 +43,9 @@ class ExtensionReporter implements TelemetryReporter {
 }
 
 export function loadDefaultTelemetryReporter(): TelemetryReporter {
-	const packageInfo = getPackageInfo();
-	return packageInfo ? new ExtensionReporter(packageInfo) : nullReporter;
+	// const packageInfo = getPackageInfo();
+	// return packageInfo ? new ExtensionReporter(packageInfo) : nullReporter;
+	return nullReporter;
 }
 
 function getPackageInfo(): IPackageInfo | null {
