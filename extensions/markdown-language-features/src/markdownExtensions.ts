@@ -82,7 +82,7 @@ export namespace MarkdownContributions {
 		extension: vscode.Extension<any>
 	): Map<string, Thenable<(md: any) => any>> {
 		const map = new Map<string, Thenable<(md: any) => any>>();
-		if (contributes['markdown.markdownItPlugins']) {
+		if (contributes['nesk.markdown.markdownItPlugins']) {
 			map.set(extension.id, extension.activate().then(() => {
 				if (extension.exports?.extendMarkdownIt) {
 					return (md: any) => extension.exports.extendMarkdownIt(md);
@@ -97,14 +97,14 @@ export namespace MarkdownContributions {
 		contributes: any,
 		extension: vscode.Extension<any>
 	) {
-		return resolveExtensionResources(extension, contributes['markdown.previewScripts']);
+		return resolveExtensionResources(extension, contributes['nesk.markdown.previewScripts']);
 	}
 
 	function getContributedStyles(
 		contributes: any,
 		extension: vscode.Extension<any>
 	) {
-		return resolveExtensionResources(extension, contributes['markdown.previewStyles']);
+		return resolveExtensionResources(extension, contributes['nesk.markdown.previewStyles']);
 	}
 }
 

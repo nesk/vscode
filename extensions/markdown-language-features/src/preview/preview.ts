@@ -466,7 +466,7 @@ export interface IManagedMarkdownPreview {
 
 export class StaticMarkdownPreview extends Disposable implements IManagedMarkdownPreview {
 
-	public static readonly customEditorViewType = 'vscode.markdown.preview.editor';
+	public static readonly customEditorViewType = 'nesk.markdown.preview.editor';
 
 	public static revive(
 		resource: vscode.Uri,
@@ -581,7 +581,7 @@ interface DynamicPreviewInput {
 
 export class DynamicMarkdownPreview extends Disposable implements IManagedMarkdownPreview {
 
-	public static readonly viewType = 'markdown.preview';
+	public static readonly viewType = 'nesk.markdown.preview';
 
 	private readonly _resourceColumn: vscode.ViewColumn;
 	private _locked: boolean;

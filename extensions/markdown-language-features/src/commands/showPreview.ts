@@ -51,7 +51,7 @@ async function showPreview(
 }
 
 export class ShowPreviewCommand implements Command {
-	public readonly id = 'markdown.showPreview';
+	public readonly id = 'nesk.markdown.showPreview';
 
 	public constructor(
 		private readonly _webviewManager: MarkdownPreviewManager,

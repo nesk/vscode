@@ -95,7 +95,7 @@ export class MdDocumentRenderer {
 			<head>
 				<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
 				<meta http-equiv="Content-Security-Policy" content="${escapeAttribute(csp)}">
-				<meta id="vscode-markdown-preview-data"
+				<meta id="nesk-markdown-preview-data"
 					data-settings="${escapeAttribute(JSON.stringify(initialData))}"
 					data-strings="${escapeAttribute(JSON.stringify(previewStrings))}"
 					data-state="${escapeAttribute(JSON.stringify(state || {}))}"
