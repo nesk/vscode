@@ -39,6 +39,22 @@ vscode.setState(state);
 
 const messaging = createPosterForVsCode(vscode, settings);
 
+(window as any).vscode = {
+	postMessage(message: unknown) {
+		messaging.postMessage('nesk.extendable-markdown-preview', { message });
+	},
+	onDidReceiveMessage(listener: (message: unknown) => any) {
+		window.addEventListener('message', async event => {
+			const data = event.data as ToWebviewMessage.Type;
+			switch (data.type) {
+				case 'nesk.extendable-markdown-preview':
+					listener(data.message);
+					break;
+			}
+		});
+	}
+};
+
 window.cspAlerter.setPoster(messaging);
 window.styleLoadingMonitor.setPoster(messaging);
 

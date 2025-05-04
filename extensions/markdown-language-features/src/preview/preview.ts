@@ -444,6 +444,12 @@ class MarkdownPreview extends Disposable implements WebviewResourceProvider {
 	//#endregion
 }
 
+let nextPreviewId = 1;
+function generatePreviewId(): string {
+	nextPreviewId = nextPreviewId++;
+	return String(nextPreviewId);
+}
+
 export interface IManagedMarkdownPreview {
 
 	readonly resource: vscode.Uri;
@@ -462,11 +468,24 @@ export interface IManagedMarkdownPreview {
 		otherPosition: vscode.ViewColumn | undefined,
 		otherLocked: boolean
 	): boolean;
+
+	readonly id: string;
+	postMessage(message: unknown): void;
+	readonly onDidReceiveMessage: vscode.Event<any>;
 }
 
 export class StaticMarkdownPreview extends Disposable implements IManagedMarkdownPreview {
 
 	public static readonly customEditorViewType = 'nesk.markdown.preview.editor';
+	public readonly id = generatePreviewId();
+
+	public postMessage(message: unknown): void {
+		this._webviewPanel.webview.postMessage(message);
+	}
+
+	public get onDidReceiveMessage() {
+		return this._webviewPanel.webview.onDidReceiveMessage.bind(this._webviewPanel.webview);
+	}
 
 	public static revive(
 		resource: vscode.Uri,
@@ -582,12 +601,21 @@ interface DynamicPreviewInput {
 export class DynamicMarkdownPreview extends Disposable implements IManagedMarkdownPreview {
 
 	public static readonly viewType = 'nesk.markdown.preview';
+	public readonly id = generatePreviewId();
 
 	private readonly _resourceColumn: vscode.ViewColumn;
 	private _locked: boolean;
 
 	private readonly _webviewPanel: vscode.WebviewPanel;
 	private _preview: MarkdownPreview;
+
+	public postMessage(message: unknown): void {
+		this._webviewPanel.webview.postMessage(message);
+	}
+
+	public get onDidReceiveMessage() {
+		return this._webviewPanel.webview.onDidReceiveMessage.bind(this._webviewPanel.webview);
+	}
 
 	public static revive(
 		input: DynamicPreviewInput,

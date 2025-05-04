@@ -14,6 +14,7 @@ import { DynamicMarkdownPreview, IManagedMarkdownPreview, StaticMarkdownPreview 
 import { MarkdownPreviewConfigurationManager } from './previewConfig';
 import { scrollEditorToLine, StartingScrollFragment } from './scrolling';
 import { TopmostLineMonitor } from './topmostLineMonitor';
+import { FromWebviewMessage } from '../../types/previewMessaging'
 
 
 export interface DynamicPreviewSettings {
@@ -78,6 +79,8 @@ export class MarkdownPreviewManager extends Disposable implements vscode.Webview
 	private readonly _staticPreviews = this._register(new PreviewStore<StaticMarkdownPreview>());
 
 	private _activePreview: IManagedMarkdownPreview | undefined = undefined;
+
+	private readonly _messageListeners: ((this: IManagedMarkdownPreview, e: FromWebviewMessage.Type) => void)[] = [];
 
 	public constructor(
 		private readonly _contentProvider: MdDocumentRenderer,
@@ -291,6 +294,7 @@ export class MarkdownPreviewManager extends Disposable implements vscode.Webview
 			// Remove other dynamic previews in our column
 			disposeAll(Array.from(this._dynamicPreviews).filter(otherPreview => preview !== otherPreview && preview.matches(otherPreview)));
 		});
+		this._applyRegisteredMessageListenersToPreview(preview);
 		return preview;
 	}
 
@@ -300,6 +304,8 @@ export class MarkdownPreviewManager extends Disposable implements vscode.Webview
 		preview.onDispose(() => {
 			this._staticPreviews.delete(preview);
 		});
+
+		this._applyRegisteredMessageListenersToPreview(preview);
 
 		this._trackActive(preview);
 		return preview;
@@ -315,6 +321,36 @@ export class MarkdownPreviewManager extends Disposable implements vscode.Webview
 				this._activePreview = undefined;
 			}
 		});
+	}
+
+	postMessage(previewId: string, message: unknown): void {
+		for (const preview of [...this._dynamicPreviews, ...this._staticPreviews]) {
+			if (preview.id === previewId) {
+				preview.postMessage({
+					type: 'nesk.extendable-markdown-preview',
+					message
+				});}
+			}
+	}
+
+	onDidReceiveMessage(listener: (message: unknown, previewId: string) => any) {
+		const wrappedListener = function (this: IManagedMarkdownPreview, e: FromWebviewMessage.Type) {
+			if (e.type === 'nesk.extendable-markdown-preview') {
+				listener(e.message, this.id);
+			}
+		};
+
+		this._messageListeners.push(wrappedListener);
+
+		for (const preview of [...this._dynamicPreviews, ...this._staticPreviews]) {
+			this._register(preview.onDidReceiveMessage(wrappedListener, preview));
+		}
+	}
+
+	private _applyRegisteredMessageListenersToPreview(preview: IManagedMarkdownPreview) {
+		for (const listener of this._messageListeners) {
+			this._register(preview.onDidReceiveMessage(listener, preview));
+		}
 	}
 
 }

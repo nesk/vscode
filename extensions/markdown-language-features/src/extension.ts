@@ -23,7 +23,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	const client = await startServer(context, engine);
 	context.subscriptions.push(client);
-	activateShared(context, client, engine, logger, contributions);
+	return activateShared(context, client, engine, logger, contributions);
 }
 
 function startServer(context: vscode.ExtensionContext, parser: IMdParser): Promise<MdLanguageClient> {

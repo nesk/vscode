@@ -47,6 +47,11 @@ export function activateShared(
 	context.subscriptions.push(vscode.workspace.onDidChangeConfiguration(() => {
 		previewManager.updateConfiguration();
 	}));
+
+	return {
+		postMessage: previewManager.postMessage.bind(previewManager),
+		onDidReceiveMessage: previewManager.onDidReceiveMessage.bind(previewManager),
+	};
 }
 
 function registerMarkdownLanguageFeatures(

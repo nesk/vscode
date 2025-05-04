@@ -38,6 +38,11 @@ export namespace FromWebviewMessage {
 		readonly unloadedStyles: readonly string[];
 	}
 
+	export interface CustomMessage extends BaseMessage {
+		readonly type: 'nesk.extendable-markdown-preview';
+		readonly message: unknown;
+	}
+
 	export type Type =
 		| CacheImageSizes
 		| RevealLine
@@ -45,6 +50,7 @@ export namespace FromWebviewMessage {
 		| ClickLink
 		| ShowPreviewSecuritySelector
 		| PreviewStyleLoadError
+		| CustomMessage
 		;
 }
 
@@ -77,11 +83,17 @@ export namespace ToWebviewMessage {
 		readonly imageSource: string;
 	}
 
+	export interface CustomMessage extends BaseMessage {
+		readonly type: 'nesk.extendable-markdown-preview';
+		readonly message: unknown;
+	}
+
 	export type Type =
 		| OnDidChangeTextEditorSelection
 		| UpdateView
 		| UpdateContent
 		| CopyImageContent
 		| OpenImageContent
+		| CustomMessage
 		;
 }
