@@ -481,6 +481,20 @@
 		{
 			"type": "extensionHost",
 			"request": "launch",
+			"name": "Extendable Markdown Preview",
+			"runtimeExecutable": "${execPath}",
+			"args": [
+				"${workspaceFolder}/extensions/markdown-language-features/test-workspace",
+				"--extensionDevelopmentPath=${workspaceFolder}/extensions/markdown-language-features",
+			],
+			"outFiles": [
+				"${workspaceFolder}/extensions/markdown-language-features/out/**/*.js"
+			],
+			"preLaunchTask": "Compile Markdown Language Features"
+		},
+		{
+			"type": "extensionHost",
+			"request": "launch",
 			"name": "TypeScript Extension Tests",
 			"runtimeExecutable": "${execPath}",
 			"args": [

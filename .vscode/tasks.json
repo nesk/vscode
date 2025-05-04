@@ -305,6 +305,15 @@
 			"problemMatcher": [
 				"$tsc"
 			]
+		},
+		{
+			"label": "Compile Markdown Language Features",
+			"type": "npm",
+			"script": "compile",
+			"problemMatcher": [],
+			"options": {
+				"cwd": "${workspaceFolder}/extensions/markdown-language-features"
+			}
 		}
 	]
 }
