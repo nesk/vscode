@@ -10,7 +10,7 @@
   "engines": {
     "vscode": "^1.70.0"
   },
-  "main": "./out/extension",
+  "main": "./dist/extension",
   "browser": "./dist/browser/extension",
   "categories": [
     "Programming Languages"
@@ -62,14 +62,12 @@
     ]
   },
   "scripts": {
-    "compile": "gulp compile-extension:markdown-language-features-languageService && gulp compile-extension:markdown-language-features && npm run build-preview && npm run build-notebook",
-    "watch": "npm run build-preview && gulp watch-extension:markdown-language-features watch-extension:markdown-language-features-languageService",
-    "vscode:prepublish": "npm run build-ext && npm run build-preview",
-    "build-ext": "node ../../node_modules/gulp/bin/gulp.js --gulpfile ../../build/gulpfile.extensions.js compile-extension:markdown-language-features ./tsconfig.json",
-    "build-notebook": "node ./esbuild-notebook.mjs",
-    "build-preview": "node ./esbuild-preview.mjs",
+    "compile": "npm run compile-media && npm run compile-ext && npm run compile-web",
+    "compile-media": "gulp compile-extension-media",
+    "compile-ext": "npx webpack-cli --config extension.webpack.config --mode none",
     "compile-web": "npx webpack-cli --config extension-browser.webpack.config --mode none",
-    "watch-web": "npx webpack-cli --config extension-browser.webpack.config --mode none --watch"
+    "vscode:prepublish": "git clean -dfx dist media *.vsix && npm run compile",
+    "package": "sh -c 'npx --yes @vscode/vsce package --no-dependencies --skip-license --no-update-package-json 1.0.0-$(npx --yes uuid | cut -d - -f 1 -)'"
   },
   "dependencies": {
     "@vscode/extension-telemetry": "^0.9.8",
