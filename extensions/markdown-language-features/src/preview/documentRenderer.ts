@@ -58,6 +58,7 @@ export class MdDocumentRenderer {
 	public async renderDocument(
 		markdownDocument: vscode.TextDocument,
 		resourceProvider: WebviewResourceProvider,
+		contributionProvider: MarkdownContributionProvider,
 		previewConfigurations: MarkdownPreviewConfigurationManager,
 		initialLine: number | undefined,
 		selectedLine: number | undefined,
@@ -79,6 +80,14 @@ export class MdDocumentRenderer {
 			webviewResourceRoot: resourceProvider.asWebviewUri(markdownDocument.uri).toString(),
 		};
 
+		const additionalSettings = Object.fromEntries(contributionProvider.contributions.additionalSettings.map(id => {
+			const idParts = id.split('.');
+			const sectionId = idParts.slice(0, -1).join('.');
+			const settingId = idParts[idParts.length - 1];
+			const value = vscode.workspace.getConfiguration(sectionId).get<boolean>(settingId);
+			return [id, value];
+		}));
+
 		this._logger.trace('DocumentRenderer', `provideTextDocumentContent - ${markdownDocument.uri}`, initialData);
 
 		// Content Security Policy
@@ -97,6 +106,7 @@ export class MdDocumentRenderer {
 				<meta http-equiv="Content-Security-Policy" content="${escapeAttribute(csp)}">
 				<meta id="nesk-markdown-preview-data"
 					data-settings="${escapeAttribute(JSON.stringify(initialData))}"
+					data-additional-settings="${escapeAttribute(JSON.stringify(additionalSettings))}"
 					data-strings="${escapeAttribute(JSON.stringify(previewStrings))}"
 					data-state="${escapeAttribute(JSON.stringify(state || {}))}"
 					data-initial-md-content="${escapeAttribute(body.html)}">

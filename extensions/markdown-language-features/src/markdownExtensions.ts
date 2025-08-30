@@ -28,6 +28,7 @@ export interface MarkdownContributions {
 	readonly previewStyles: readonly vscode.Uri[];
 	readonly previewResourceRoots: readonly vscode.Uri[];
 	readonly markdownItPlugins: ReadonlyMap<string, Thenable<(md: any) => any>>;
+	readonly additionalSettings: readonly string[];
 }
 
 export namespace MarkdownContributions {
@@ -35,7 +36,8 @@ export namespace MarkdownContributions {
 		previewScripts: [],
 		previewStyles: [],
 		previewResourceRoots: [],
-		markdownItPlugins: new Map()
+		markdownItPlugins: new Map(),
+		additionalSettings: []
 	};
 
 	export function merge(a: MarkdownContributions, b: MarkdownContributions): MarkdownContributions {
@@ -44,6 +46,7 @@ export namespace MarkdownContributions {
 			previewStyles: [...a.previewStyles, ...b.previewStyles],
 			previewResourceRoots: [...a.previewResourceRoots, ...b.previewResourceRoots],
 			markdownItPlugins: new Map([...a.markdownItPlugins.entries(), ...b.markdownItPlugins.entries()]),
+			additionalSettings: [...a.additionalSettings, ...b.additionalSettings]
 		};
 	}
 
@@ -68,13 +71,23 @@ export namespace MarkdownContributions {
 		const previewScripts = Array.from(getContributedScripts(contributions, extension));
 		const previewResourceRoots = previewStyles.length || previewScripts.length ? [extension.extensionUri] : [];
 		const markdownItPlugins = getContributedMarkdownItPlugins(contributions, extension);
+		const additionalSettings = getContributedAdditionalSettings(contributions);
 
 		return {
 			previewScripts,
 			previewStyles,
 			previewResourceRoots,
-			markdownItPlugins
+			markdownItPlugins,
+			additionalSettings
 		};
+	}
+
+	function getContributedAdditionalSettings(contributes: any): string[] {
+		const additionalSettings = contributes['nesk.markdown.additionalSettings'];
+		if (Array.isArray(additionalSettings) && additionalSettings.every(v => typeof v === 'string')) {
+			return additionalSettings;
+		}
+		return [];
 	}
 
 	function getContributedMarkdownItPlugins(
