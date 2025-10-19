@@ -176,19 +176,20 @@ export class MarkdownItEngine implements IMdParser {
 		this._md = undefined;
 	}
 
-	private _tokenizeDocument(
+	private async _tokenizeDocument(
 		document: ITextDocument,
 		config: MarkdownItConfig,
 		engine: MarkdownIt
-	): Token[] {
+	): Promise<Token[]> {
 		const cached = this._tokenCache.tryGetCached(document, config);
-		if (cached) {
-			this._resetSlugCount();
-			return cached;
-		}
+		// if (cached) {
+		// 	this._resetSlugCount();
+		// 	return cached;
+		// }
 
 		this._logger.trace('MarkdownItEngine', `tokenizeDocument - ${document.uri}`);
-		const tokens = this._tokenizeString(document.getText(), engine);
+		const text = new TextDecoder().decode(await vscode.workspace.fs.readFile(document.uri));
+		const tokens = this._tokenizeString(text, engine);
 		this._tokenCache.update(document, config, tokens);
 		return tokens;
 	}
@@ -209,7 +210,7 @@ export class MarkdownItEngine implements IMdParser {
 
 		const tokens = typeof input === 'string'
 			? this._tokenizeString(input, engine)
-			: this._tokenizeDocument(input, config, engine);
+			: await this._tokenizeDocument(input, config, engine);
 
 		const env: RenderEnv = {
 			containingImages: new Set<string>(),
